@@ -1,4 +1,5 @@
 import type { ExportSettings, TemplateSettings } from "@shared/types";
+import { getSocialSizePreset } from "@shared/social-presets";
 
 export interface Dimensions {
   width: number;
@@ -17,7 +18,8 @@ export function outputDimensions(sourceWidth: number, sourceHeight: number, sett
   if (settings.resizeMode === "custom") {
     return { width: normalizeOutputDimension(settings.customWidth), height: normalizeOutputDimension(settings.customHeight) };
   }
-  return { width: 1600, height: 1200 };
+  const preset = getSocialSizePreset(settings.presetId);
+  return { width: preset.width, height: preset.height };
 }
 
 export function imageDestination(sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number, fit: ExportSettings["fitMode"]) {

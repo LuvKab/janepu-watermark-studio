@@ -95,6 +95,11 @@ test("imports images, swaps the logo, applies templates, and exports without ove
     await writeFile("test-results/janepu-watermark-preview.png", screenshotBytes);
 
     await window.getByText("导出设置", { exact: true }).click();
+    await window.getByRole("button", { name: "社媒预设", exact: true }).click();
+    await window.getByLabel("社媒尺寸预设").selectOption("pinterest-pin");
+    await expect(window.getByText("1000 × 1500 输出预览")).toBeVisible();
+    await window.locator(".settings-scroll").evaluate((element) => { element.scrollTop = element.scrollHeight; });
+    await window.screenshot({ path: "test-results/janepu-watermark-social-presets.png" });
     await window.getByRole("button", { name: "自定义", exact: true }).click();
     await window.getByLabel("自定义宽度").fill("1080");
     await window.getByLabel("自定义高度").fill("1350");

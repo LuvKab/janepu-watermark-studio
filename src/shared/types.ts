@@ -1,3 +1,5 @@
+import type { SocialSizePresetId } from "./social-presets";
+
 export type TemplateKind = "corner" | "center" | "diagonal" | "tile";
 export type OutputFormat = "jpeg" | "png";
 export type ResizeMode = "original" | "fixed" | "custom";
@@ -26,6 +28,7 @@ export interface TemplateSettings {
 
 export interface ExportSettings {
   resizeMode: ResizeMode;
+  presetId: SocialSizePresetId;
   customWidth: number;
   customHeight: number;
   fitMode: FitMode;

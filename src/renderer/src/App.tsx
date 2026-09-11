@@ -34,6 +34,7 @@ import type {
   TemplateSettings,
   WatermarkStrength,
 } from "@shared/types";
+import { defaultSocialSizePresetId, getSocialSizePreset, socialPresetPlatforms, socialSizePresets } from "@shared/social-presets";
 import { analyzeBitmap, decodeImage, makeThumbnail } from "./lib/image";
 import { clampPoint } from "./lib/placement";
 import { canvasToBytes, outputDimensions, renderWatermarked } from "./lib/render";
@@ -62,6 +63,7 @@ interface WatermarkAsset {
 
 const defaultExport: ExportSettings = {
   resizeMode: "original",
+  presetId: defaultSocialSizePresetId,
   customWidth: 1600,
   customHeight: 1200,
   fitMode: "contain",
@@ -545,6 +547,7 @@ export function App() {
     () => (activeImage ? outputDimensions(activeImage.width, activeImage.height, exportSettings) : null),
     [activeImage, exportSettings],
   );
+  const activeSocialPreset = useMemo(() => getSocialSizePreset(exportSettings.presetId), [exportSettings.presetId]);
 
   return (
     <main
@@ -838,9 +841,28 @@ export function App() {
               <div className="export-options-content">
                 <div className="segmented size-presets">
                   <button className={exportSettings.resizeMode === "original" ? "selected" : ""} onClick={() => setExportSettings((value) => ({ ...value, resizeMode: "original" }))}>原图尺寸</button>
-                  <button className={exportSettings.resizeMode === "fixed" ? "selected" : ""} onClick={() => setExportSettings((value) => ({ ...value, resizeMode: "fixed" }))}>1600 × 1200</button>
+                  <button className={exportSettings.resizeMode === "fixed" ? "selected" : ""} onClick={() => setExportSettings((value) => ({ ...value, resizeMode: "fixed" }))}>社媒预设</button>
                   <button className={exportSettings.resizeMode === "custom" ? "selected" : ""} onClick={() => setExportSettings((value) => ({ ...value, resizeMode: "custom" }))}>自定义</button>
                 </div>
+                {exportSettings.resizeMode === "fixed" && (
+                  <label className="social-preset-field">
+                    <span>平台与发布场景</span>
+                    <select
+                      aria-label="社媒尺寸预设"
+                      value={exportSettings.presetId}
+                      onChange={(event) => setExportSettings((value) => ({ ...value, presetId: event.target.value as ExportSettings["presetId"] }))}
+                    >
+                      {socialPresetPlatforms.map((platform) => (
+                        <optgroup key={platform} label={platform}>
+                          {socialSizePresets.filter((preset) => preset.platform === platform).map((preset) => (
+                            <option key={preset.id} value={preset.id}>{preset.label} · {preset.width} × {preset.height}</option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                    <small>{activeSocialPreset.platform} · {activeSocialPreset.label} · {activeSocialPreset.ratio}</small>
+                  </label>
+                )}
                 {exportSettings.resizeMode === "custom" && (
                   <div className="custom-size-grid">
                     <label>宽度 <input aria-label="自定义宽度" type="number" min="1" max="32767" value={exportSettings.customWidth} onChange={(event) => setExportSettings((value) => ({ ...value, customWidth: Number(event.target.value) }))} /></label>

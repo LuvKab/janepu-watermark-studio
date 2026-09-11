@@ -1,6 +1,6 @@
 {
   "name": "janepu-watermark-studio",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Privacy-first, offline batch watermark studio with custom logos and reusable templates",
   "private": true,
   "type": "module",
