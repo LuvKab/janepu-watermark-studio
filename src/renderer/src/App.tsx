@@ -61,7 +61,9 @@ interface WatermarkAsset {
 }
 
 const defaultExport: ExportSettings = {
-  resizeMode: "fixed",
+  resizeMode: "original",
+  customWidth: 1600,
+  customHeight: 1200,
   fitMode: "contain",
   format: "jpeg",
   jpegQuality: 92,
@@ -823,7 +825,7 @@ export function App() {
               <div>
                 <span className="eyebrow">READY TO EXPORT</span>
                 <strong>{selectedCount ? `${selectedCount} 张已选图片` : `全部 ${images.length} 张图片`}</strong>
-                <small>{exportSettings.format === "jpeg" ? "JPG" : "PNG"} · {exportSettings.resizeMode === "fixed" ? "1600 × 1200" : "保持原尺寸"}</small>
+                <small>{exportSettings.format === "jpeg" ? "JPG" : "PNG"} · {dimensions ? `${dimensions.width} × ${dimensions.height}` : "保持原尺寸"}</small>
               </div>
               <button className="primary-button export-main" onClick={exportImages} disabled={busy || !watermarkLogo}>
                 {exportProgress && busy ? <LoaderCircle className="spin" /> : <Download />}
@@ -834,11 +836,20 @@ export function App() {
             <details className="export-options">
               <summary><span>导出设置</span><small>格式、尺寸与目录</small><ChevronDown className="details-chevron" /></summary>
               <div className="export-options-content">
-                <div className="segmented">
+                <div className="segmented size-presets">
+                  <button className={exportSettings.resizeMode === "original" ? "selected" : ""} onClick={() => setExportSettings((value) => ({ ...value, resizeMode: "original" }))}>原图尺寸</button>
                   <button className={exportSettings.resizeMode === "fixed" ? "selected" : ""} onClick={() => setExportSettings((value) => ({ ...value, resizeMode: "fixed" }))}>1600 × 1200</button>
-                  <button className={exportSettings.resizeMode === "original" ? "selected" : ""} onClick={() => setExportSettings((value) => ({ ...value, resizeMode: "original" }))}>保持原尺寸</button>
+                  <button className={exportSettings.resizeMode === "custom" ? "selected" : ""} onClick={() => setExportSettings((value) => ({ ...value, resizeMode: "custom" }))}>自定义</button>
                 </div>
-                {exportSettings.resizeMode === "fixed" && (
+                {exportSettings.resizeMode === "custom" && (
+                  <div className="custom-size-grid">
+                    <label>宽度 <input aria-label="自定义宽度" type="number" min="1" max="32767" value={exportSettings.customWidth} onChange={(event) => setExportSettings((value) => ({ ...value, customWidth: Number(event.target.value) }))} /></label>
+                    <span aria-hidden="true">×</span>
+                    <label>高度 <input aria-label="自定义高度" type="number" min="1" max="32767" value={exportSettings.customHeight} onChange={(event) => setExportSettings((value) => ({ ...value, customHeight: Number(event.target.value) }))} /></label>
+                    <small>支持 1–32767 px，导出时自动取整。</small>
+                  </div>
+                )}
+                {exportSettings.resizeMode !== "original" && (
                   <div className="segmented subdued">
                     <button className={exportSettings.fitMode === "contain" ? "selected" : ""} onClick={() => setExportSettings((value) => ({ ...value, fitMode: "contain" }))}>完整显示</button>
                     <button className={exportSettings.fitMode === "cover" ? "selected" : ""} onClick={() => setExportSettings((value) => ({ ...value, fitMode: "cover" }))}>填充裁切</button>

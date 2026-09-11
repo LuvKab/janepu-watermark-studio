@@ -5,8 +5,19 @@ export interface Dimensions {
   height: number;
 }
 
+export function normalizeOutputDimension(value: number): number {
+  if (!Number.isFinite(value)) return 1;
+  return Math.max(1, Math.min(32767, Math.round(value)));
+}
+
 export function outputDimensions(sourceWidth: number, sourceHeight: number, settings: ExportSettings): Dimensions {
-  return settings.resizeMode === "original" ? { width: sourceWidth, height: sourceHeight } : { width: 1600, height: 1200 };
+  if (settings.resizeMode === "original") {
+    return { width: normalizeOutputDimension(sourceWidth), height: normalizeOutputDimension(sourceHeight) };
+  }
+  if (settings.resizeMode === "custom") {
+    return { width: normalizeOutputDimension(settings.customWidth), height: normalizeOutputDimension(settings.customHeight) };
+  }
+  return { width: 1600, height: 1200 };
 }
 
 export function imageDestination(sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number, fit: ExportSettings["fitMode"]) {

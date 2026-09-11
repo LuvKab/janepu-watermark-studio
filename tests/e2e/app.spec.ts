@@ -1,6 +1,6 @@
 import { _electron as electron, expect, test } from "@playwright/test";
 import { existsSync } from "node:fs";
-import { mkdir, mkdtemp, readdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -8,6 +8,20 @@ const defaultReferenceDirectory = "/home/xyras/桌面/简普小红书_首篇发�
 const referenceDirectory = process.env.JANEPU_VISUAL_FIXTURES ?? defaultReferenceDirectory;
 const referenceNames = ["01_客厅效果图.jpg", "02_沙发原型.jpg", "03_茶几原型.jpg", "04_单人椅原型.jpg"];
 const fallbackJpeg = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUEBAQEAwUEBAQGBQUGCA0ICAcHCBALDAkNExAUExIQEhIUFx0ZFBYcFhISGiMaHB4fISEhFBkkJyQgJh0gISD/2wBDAQUGBggHCA8ICA8gFRIVICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICD/wAARCADwAUADASIAAhEBAxEB/8QAHAABAQADAQEBAQAAAAAAAAAAAAMEBQcGAQII/8QAPRABAQAAAwUFBAcHAgcAAAAAABIBAgQDBQYW0REVU1WRE5Oj0gc2UnSys8ExcnOBgoOxQXEUISIkUWHw/8QAGQEBAAMBAQAAAAAAAAAAAAAAAAIDBAEF/8QAIREBAAIBBQEBAQEBAAAAAAAAAAECUQMRExQyMQQSIXH/2gAMAwEAAhEDEQA/AP6GopGinkvSWopGigWopGigWopGigWopGigWopGigWopGigWopGigWopGigWopGigWopGigWopGigWopGigWopGigWopGigWopGigWopGigWopGigWopGigWopGigQopCihxeikKKBeikKKBeikKKBeikKKBeikKKBeikKKBeikKKBeikKKBeikKKBeikKKBeikKKBeikKKBeikKKBeikKKBeikKKBeikKKBeikKKBeikKKBeikKKBCikaKBaikaKBaikaKBaikaKBaikaKBaikaKBaikaKBaikaKBaikaKBaikaKBaikaKBaikaKBaikaKBaikaKBaikaKBaikaKBaikaKBaikaKBaikaKBaikaKBCikKKdF6KQooF6KQooF6KQooF6KQooF6KQooF6KQooF6KQooF6KQooF6KQooF6KQooF6KQooF6KQooF6KQooF6KQooF6KQooF6KQooF6KQooF6KQooF6KQooEKKRooFqKRooFqKRooFqKRooFqKRooFqKRooFqKRooFqKRooFqKRooFqKRooFqKRooFqKRooFqKRooFqKRooFqKRooFqKRooFqKRooFqKRooFqKRooFqKRooGPRSNFAtRSNFAtRSNFAtRSNFAtRSNMnYaLXarZ47TS6Lb7fJhjOObZ7PHNhhj/wCO3DAH4opkd0738r1nuM3Q7p3v5XrPcZujuxux6KZHdO9/K9Z7jN0O6d7+V6z3GbobG7Ho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";
+
+function jpegDimensions(bytes: Buffer) {
+  let offset = 2;
+  while (offset + 8 < bytes.length) {
+    if (bytes[offset] !== 0xff) { offset += 1; continue; }
+    const marker = bytes[offset + 1];
+    const length = bytes.readUInt16BE(offset + 2);
+    if (marker >= 0xc0 && marker <= 0xc3) {
+      return { width: bytes.readUInt16BE(offset + 7), height: bytes.readUInt16BE(offset + 5) };
+    }
+    offset += 2 + length;
+  }
+  throw new Error("JPEG dimensions not found");
+}
 
 test("imports images, swaps the logo, applies templates, and exports without overwriting", async () => {
   let generatedReferenceDirectory: string | null = null;
@@ -81,13 +95,19 @@ test("imports images, swaps the logo, applies templates, and exports without ove
     await writeFile("test-results/janepu-watermark-preview.png", screenshotBytes);
 
     await window.getByText("导出设置", { exact: true }).click();
+    await window.getByRole("button", { name: "自定义", exact: true }).click();
+    await window.getByLabel("自定义宽度").fill("1080");
+    await window.getByLabel("自定义高度").fill("1350");
+    await expect(window.getByText("1080 × 1350 输出预览")).toBeVisible();
     await window.getByRole("button", { name: "首次导出时选择目录" }).click({ force: true });
     const exportButton = window.getByRole("button", { name: "导出全部 4 张" });
     await exportButton.click({ force: true });
     await expect(exportButton).toBeDisabled();
     await expect(window.getByText("已导出 4 张图片，原图未修改。")).toBeVisible({ timeout: 40_000 });
     await expect(exportButton).toBeEnabled();
-    expect((await readdir(outputDirectory)).filter((name) => name.endsWith(".jpg"))).toHaveLength(4);
+    const firstOutputs = (await readdir(outputDirectory)).filter((name) => name.endsWith(".jpg"));
+    expect(firstOutputs).toHaveLength(4);
+    expect(jpegDimensions(await readFile(join(outputDirectory, firstOutputs[0])))).toEqual({ width: 1080, height: 1350 });
 
     await exportButton.click({ force: true });
     await expect(exportButton).toBeDisabled();

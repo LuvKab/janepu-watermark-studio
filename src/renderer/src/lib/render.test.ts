@@ -1,13 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { imageDestination, outputDimensions, resolveWatermarkColor } from "./render";
+import { imageDestination, normalizeOutputDimension, outputDimensions, resolveWatermarkColor } from "./render";
 
 describe("render geometry", () => {
   it("defaults to the 1600 by 1200 delivery canvas", () => {
-    expect(outputDimensions(900, 1600, { resizeMode: "fixed", fitMode: "contain", format: "jpeg", jpegQuality: 92 })).toEqual({ width: 1600, height: 1200 });
+    expect(outputDimensions(900, 1600, { resizeMode: "fixed", customWidth: 900, customHeight: 900, fitMode: "contain", format: "jpeg", jpegQuality: 92 })).toEqual({ width: 1600, height: 1200 });
   });
 
   it("can preserve source dimensions", () => {
-    expect(outputDimensions(2048, 1365, { resizeMode: "original", fitMode: "contain", format: "png", jpegQuality: 92 })).toEqual({ width: 2048, height: 1365 });
+    expect(outputDimensions(2048, 1365, { resizeMode: "original", customWidth: 1600, customHeight: 1200, fitMode: "contain", format: "png", jpegQuality: 92 })).toEqual({ width: 2048, height: 1365 });
+  });
+
+  it("supports arbitrary custom output dimensions within the Canvas limit", () => {
+    expect(outputDimensions(2048, 1365, { resizeMode: "custom", customWidth: 1080, customHeight: 1920, fitMode: "cover", format: "png", jpegQuality: 92 })).toEqual({ width: 1080, height: 1920 });
+    expect(normalizeOutputDimension(0)).toBe(1);
+    expect(normalizeOutputDimension(50_000)).toBe(32767);
   });
 
   it("contains without cropping and covers with centered cropping", () => {

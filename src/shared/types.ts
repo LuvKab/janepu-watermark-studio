@@ -1,6 +1,6 @@
 export type TemplateKind = "corner" | "center" | "diagonal" | "tile";
 export type OutputFormat = "jpeg" | "png";
-export type ResizeMode = "fixed" | "original";
+export type ResizeMode = "original" | "fixed" | "custom";
 export type FitMode = "contain" | "cover";
 export type WatermarkTone = "original" | "dark" | "light" | "custom";
 export type PlacementMode = "auto" | "manual";
@@ -26,6 +26,8 @@ export interface TemplateSettings {
 
 export interface ExportSettings {
   resizeMode: ResizeMode;
+  customWidth: number;
+  customHeight: number;
   fitMode: FitMode;
   format: OutputFormat;
   jpegQuality: number;
