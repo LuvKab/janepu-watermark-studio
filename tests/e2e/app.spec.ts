@@ -87,7 +87,8 @@ test("imports images, swaps the logo, applies templates, and exports without ove
     const previewCanvas = window.locator("canvas.preview-canvas");
     await expect(previewCanvas).toBeVisible();
     await window.getByText("高级调整", { exact: true }).click();
-    await previewCanvas.evaluate((canvas) => canvas.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })));
+    await previewCanvas.focus();
+    await previewCanvas.press("ArrowRight");
     await expect(window.getByText("手动", { exact: true }).first()).toBeVisible();
     const previewData = await previewCanvas.evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL("image/png"));
     const screenshotBytes = Buffer.from(previewData.split(",")[1], "base64");
