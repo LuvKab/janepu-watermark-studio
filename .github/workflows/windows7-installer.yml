@@ -1,0 +1,36 @@
+name: Windows 7 32-bit installer
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  legacy:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - name: Install legacy runtime for integration tests
+        run: npm install --no-save --package-lock=false electron@22.3.27
+        env:
+          npm_config_arch: ia32
+      - name: Test legacy runtime
+        run: npm run test:e2e
+      - name: Build Win7 x86 installer
+        run: npx electron-builder --win nsis --ia32 --publish never -c.electronVersion=22.3.27 -c.appId=com.janepu.watermarkstudio.win7 -c.productName="简普水印工作室 Win7兼容版" -c.win.artifactName=janepu-watermark-studio-win7-32bit-0.3.0.exe
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Publish compatibility installer
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create win7-0.3.0 --target ${{ github.sha }} --title "Win7 32位兼容版 0.3.0" --notes "面向 Windows 7 32 位旧电脑的离线兼容版本。基于 Electron 22.3.27（已停止安全更新）。保留水印模板、自定义 Logo 和社媒尺寸。建议小批量处理图片。已在 Windows CI 测试旧运行环境；尚未在真实 Windows 7 电脑上验证。安装程序未签名。" --prerelease
+          gh release upload win7-0.3.0 release/janepu-watermark-studio-win7-32bit-0.3.0.exe

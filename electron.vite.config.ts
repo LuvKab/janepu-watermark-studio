@@ -4,11 +4,13 @@ import { resolve } from "node:path";
 
 export default defineConfig({
   main: {
+    build: { target: "node16" },
     plugins: [externalizeDepsPlugin()],
   },
   preload: {
     plugins: [externalizeDepsPlugin()],
     build: {
+      target: "node16",
       rollupOptions: {
         output: {
           format: "cjs",
@@ -18,6 +20,7 @@ export default defineConfig({
     },
   },
   renderer: {
+    build: { target: "chrome108" },
     root: resolve("src/renderer"),
     resolve: {
       alias: {

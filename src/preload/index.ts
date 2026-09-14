@@ -4,7 +4,9 @@ import type { JanepuBridge, SaveExportRequest } from "../shared/types";
 const bridge: JanepuBridge = {
   selectImages: () => ipcRenderer.invoke("images:select"),
   registerDroppedFiles: (paths) => ipcRenderer.invoke("images:register", paths),
-  pathForFile: (file) => webUtils.getPathForFile(file),
+  pathForFile: (file) => webUtils?.getPathForFile
+    ? webUtils.getPathForFile(file)
+    : (file as File & { path?: string }).path ?? "",
   readImage: (id) => ipcRenderer.invoke("images:read", id),
   selectWatermark: () => ipcRenderer.invoke("watermark:select"),
   chooseOutputDirectory: () => ipcRenderer.invoke("exports:choose-directory"),
