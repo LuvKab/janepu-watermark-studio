@@ -2,7 +2,8 @@ import type { PlacementAnalysisResponse, PlacementSuggestion, TemplateKind } fro
 
 export async function decodeImage(bytes: Uint8Array): Promise<ImageBitmap> {
   const copy = new Uint8Array(bytes);
-  return createImageBitmap(new Blob([copy]), { imageOrientation: "from-image" });
+  // Use the decoder default: Chromium 108 rejects the newer "from-image" enum.
+  return createImageBitmap(new Blob([copy]));
 }
 
 export async function makeThumbnail(bitmap: ImageBitmap): Promise<string> {
