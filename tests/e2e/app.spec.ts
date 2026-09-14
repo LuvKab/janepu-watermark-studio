@@ -121,6 +121,9 @@ test("imports images, swaps the logo, applies templates, and exports without ove
     const outputs = (await readdir(outputDirectory)).filter((name) => name.endsWith(".jpg"));
     expect(outputs).toHaveLength(8);
     expect(outputs.some((name) => name.includes("_janepu-2.jpg"))).toBe(true);
+  } catch (error) {
+    console.log(await electronApp.windows()[0]?.locator("body").innerText());
+    throw error;
   } finally {
     await electronApp.close();
     await rm(outputDirectory, { recursive: true, force: true });

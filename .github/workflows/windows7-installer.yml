@@ -23,6 +23,11 @@ jobs:
           npm_config_arch: ia32
       - name: Test legacy runtime
         run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: legacy-test-diagnostics
+          path: test-results
       - name: Build Win7 x86 installer
         run: npx electron-builder --win nsis --ia32 --publish never -c.electronVersion=22.3.27 -c.appId=com.janepu.watermarkstudio.win7 -c.productName="简普水印工作室 Win7兼容版" -c.win.artifactName=janepu-watermark-studio-win7-32bit-0.3.0.exe
         env:
