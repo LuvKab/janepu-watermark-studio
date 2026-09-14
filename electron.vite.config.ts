@@ -4,7 +4,10 @@ import { resolve } from "node:path";
 
 export default defineConfig({
   main: {
-    build: { target: "node16" },
+    build: {
+      target: "node16",
+      rollupOptions: { output: { format: "cjs", entryFileNames: "[name].cjs" } },
+    },
     plugins: [externalizeDepsPlugin()],
   },
   preload: {
