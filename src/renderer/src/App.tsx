@@ -310,7 +310,8 @@ export function App() {
           setActiveId((current) => current ?? item.id);
           added += 1;
           setStatus(`正在本地分析图片位置… ${added + failed}/${records.length}`);
-        } catch {
+        } catch (error) {
+          console.error("图片导入失败", error);
           failed += 1;
         }
       }
